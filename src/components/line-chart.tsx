@@ -146,7 +146,7 @@ import {
 } from "@/components/ui/card";
 
 import {
-  ChartConfig,
+  // ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,

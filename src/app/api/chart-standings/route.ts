@@ -7,7 +7,7 @@ async function fetchWithRetry(url: string, retries = 3, delay = 1000): Promise<R
       if (response.ok) {
         return response;
       }
-    } catch (error) {
+    } catch {
       console.error(`Retry ${i + 1} failed for ${url}`);
     }
     await new Promise((resolve) => setTimeout(resolve, delay)); // Wait before retrying
@@ -47,7 +47,7 @@ export async function GET() {
                 entry_name: manager.entry_name,
                 rank: entryData.entry_history.rank, // Use the league rank from the gameweek data
               };
-            } catch (error) {
+            } catch {
               console.error(
                 `Failed to fetch gameweek ${gameweek} data for team ${manager.entry_name} (entry: ${manager.entry})`
               );
