@@ -100,6 +100,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { LineChartComponent } from "@/components/line-chart";
+import { Separator } from "@/components/ui/separator";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
 export default function Home() {
   interface Team {
@@ -138,7 +140,7 @@ export default function Home() {
   return (
     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
       <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <h1 className="text-2xl font-bold">FPL League Standings</h1>
+        <h1 className="text-2xl font-bold">S.a.G FPL League Standings</h1>
         <div className="flex gap-4 items-center">
           <Button variant="outline" onClick={() => fetchStandings(selectedGameweek)} disabled={loading}>
             {loading ? "Refreshing..." : "Refresh Standings"}
@@ -178,6 +180,14 @@ export default function Home() {
             ))}
           </TableBody>
         </Table>
+            <Separator className="my-4" />
+            <Alert>
+  {/* <Terminal className="h-4 w-4" /> */}
+  <AlertTitle>Heads up!</AlertTitle>
+  <AlertDescription>
+    Historic League Chart takes long to load, give it some time. 
+  </AlertDescription>
+</Alert>
 
         <LineChartComponent />
       </main>

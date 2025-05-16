@@ -1,77 +1,92 @@
 import { NextResponse } from "next/server";
 
-async function fetchWithRetry(url: string, retries = 3, delay = 1000): Promise<Response> {
+async function fetchWithRetry(url: string, retries = 3, delay = 1000): Promise<unknown> {
   for (let i = 0; i < retries; i++) {
     try {
       const response = await fetch(url);
       if (response.ok) {
-        return response;
+        return response.json();
       }
     } catch {
       console.error(`Retry ${i + 1} failed for ${url}`);
     }
-    await new Promise((resolve) => setTimeout(resolve, delay)); // Wait before retrying
+    await new Promise((resolve) => setTimeout(resolve, delay));
   }
   throw new Error(`Failed to fetch ${url} after ${retries} retries`);
 }
 
 export async function GET() {
   try {
-    const leagueId = "298749"; // Replace with your league ID
-
-    // Fetch the initial league standings to get the list of managers
+    const leagueId = "298749";
+    // 1. Get all managers in the league (first 50, or fetch all pages if needed)
     const leagueResponse = await fetchWithRetry(
       `https://fantasy.premierleague.com/api/leagues-classic/${leagueId}/standings/`
-    );
+    ) as {
+      standings?: { results?: { entry: number; entry_name: string }[] }
+    };
+    type Manager = { entry: number; entry_name: string };
+    const managers = leagueResponse.standings?.results?.map((m: Manager) => ({
+      entry: m.entry,
+      entry_name: m.entry_name,
+    })) || [];
 
-    const leagueData = await leagueResponse.json();
+    // 2. For each manager, fetch their total points for each gameweek
+    type ManagerGameweekData = {
+      gameweek: number;
+      entry: number;
+      entry_name: string;
+      total_points: number | null;
+      rank?: number;
+    };
+    const allData: ManagerGameweekData[] = [];
+    for (let gameweek = 1; gameweek <= 38; gameweek++) {
+      await new Promise((resolve) => setTimeout(resolve, 1000)); // Throttle to avoid rate limits
+      const gwData = await Promise.all(managers.map(async (manager: Manager) => {
+        try {
+          const entryData = await fetchWithRetry(
+            `https://fantasy.premierleague.com/api/entry/${manager.entry}/event/${gameweek}/picks/`
+          ) as { entry_history: { total_points: number } };
+          return {
+            gameweek,
+            entry: manager.entry,
+            entry_name: manager.entry_name,
+            total_points: entryData.entry_history.total_points,
+          };
+        } catch {
+          return {
+            gameweek,
+            entry: manager.entry,
+            entry_name: manager.entry_name,
+            total_points: null,
+          };
+        }
+      }));
+      allData.push(...gwData);
+    }
 
-    // Extract the list of managers (teams)
-    const managers = leagueData.standings.results;
+    // 3. For each gameweek, rank managers by total_points
+for (let gameweek = 1; gameweek <= 38; gameweek++) {
+  const gwManagers = allData.filter(d => d.gameweek === gameweek && d.total_points !== null);
+  gwManagers.sort((a, b) => (b.total_points ?? 0) - (a.total_points ?? 0));
+  gwManagers.forEach((manager, idx) => {
+    manager.rank = idx + 1;
+  });
+}
 
-    // Fetch league-specific rank for all managers across all gameweeks (1–38)
-    const historicStandings = await Promise.all(
-      Array.from({ length: 38 }, (_, i) => i + 1).map(async (gameweek) => {
-        await new Promise((resolve) => setTimeout(resolve, 1000)); // Throttle requests
-        const gameweekData = await Promise.all(
-          managers.map(async (manager: { entry: number; entry_name: string }) => {
-            try {
-              const entryResponse = await fetchWithRetry(
-                `https://fantasy.premierleague.com/api/entry/${manager.entry}/event/${gameweek}/picks/`
-              );
 
-              const entryData = await entryResponse.json();
 
-              return {
-                gameweek,
-                entry_name: manager.entry_name,
-                rank: entryData.entry_history.rank, // Use the league rank from the gameweek data
-              };
-            } catch {
-              console.error(
-                `Failed to fetch gameweek ${gameweek} data for team ${manager.entry_name} (entry: ${manager.entry})`
-              );
-              return {
-                gameweek,
-                entry_name: manager.entry_name,
-                rank: null, // Default to null if the fetch fails
-              };
-            }
-          })
-        );
-
-        return gameweekData;
-      })
-    );
-
-    // Flatten the array of gameweek standings
-    const flattenedStandings = historicStandings.flat();
-
-    return NextResponse.json(flattenedStandings);
-  } catch (error) {
-    console.error("Error fetching historic league standings:", error);
+    return NextResponse.json(allData);
+    
+  } catch (error: unknown) {
+    console.error("Error fetching league standings by points:", error);
+    let message = "Unknown error";
+    if (error instanceof Error) {
+      message = error.message;
+    } else if (typeof error === "string") {
+      message = error;
+    }
     return NextResponse.json(
-      { error: "Internal Server Error" },
+      { error: "Internal Server Error", details: message },
       { status: 500 }
     );
   }
