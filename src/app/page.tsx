@@ -103,6 +103,7 @@ import { LineChartComponent } from "@/components/line-chart";
 import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import Profile from "@/components/profile";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export default function Home() {
   interface Team {
@@ -146,7 +147,7 @@ export default function Home() {
           <Button variant="outline" onClick={() => fetchStandings(selectedGameweek)} disabled={loading}>
             {loading ? "Refreshing..." : "Refresh Standings"}
           </Button>
-<Select onValueChange={(value) => setSelectedGameweek(Number(value))}>
+{/* <Select onValueChange={(value) => setSelectedGameweek(Number(value))}>
   <SelectTrigger className="w-[180px]">
     <SelectValue placeholder={`Gameweek ${selectedGameweek}`} />
   </SelectTrigger>
@@ -157,6 +158,22 @@ export default function Home() {
       </SelectItem>
     ))}
   </SelectContent>
+</Select> */}
+
+<Select onValueChange={(value) => setSelectedGameweek(Number(value))}>
+  <SelectTrigger className="w-[180px]">
+    <SelectValue placeholder={`Gameweek ${selectedGameweek}`} />
+  </SelectTrigger>
+  {/* Wrap SelectContent with ScrollArea */}
+<ScrollArea className="max-h-60">
+  <SelectContent className="max-h-60 overflow-y-auto">
+    {Array.from({ length: 38 }, (_, i) => (
+      <SelectItem key={i + 1} value={(i + 1).toString()}>
+        Gameweek {i + 1}
+      </SelectItem>
+    ))}
+  </SelectContent>
+</ScrollArea>
 </Select>
         </div>
         <Table className="w-full max-w-4xl">
