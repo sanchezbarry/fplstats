@@ -102,6 +102,7 @@ import {
 import { LineChartComponent } from "@/components/line-chart";
 import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import Profile from "@/components/profile";
 
 export default function Home() {
   interface Team {
@@ -190,6 +191,8 @@ export default function Home() {
 </Alert>
 
         <LineChartComponent />
+        <Separator className="my-4" />
+        <Profile />
       </main>
     </div>
   );
