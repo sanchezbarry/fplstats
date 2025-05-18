@@ -63,7 +63,7 @@ export default function Profile() {
   }, [selectedManager]);
 
   return (
-    <div className="max-w-xl mx-auto p-4">
+    <div id="profile" className="max-w-xl mx-auto p-4">
       <h2 className="text-xl font-bold mb-4">Manager Profile</h2>
       <div className="mb-6">
         <Select
@@ -77,8 +77,8 @@ export default function Profile() {
           <SelectTrigger>
             <SelectValue placeholder={loadingManagers ? "Loading managers..." : "Select a manager"} />
           </SelectTrigger>
-          <ScrollArea className="max-h-10">
-          <SelectContent>
+          <ScrollArea >
+          <SelectContent className="max-h-60">
             {managers.map((manager) => (
               <SelectItem key={manager.entry} value={String(manager.entry)}>
                 {manager.entry_name}

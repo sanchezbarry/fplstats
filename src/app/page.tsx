@@ -104,6 +104,8 @@ import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import Profile from "@/components/profile";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { NavigationMenuDemo } from "@/components/nav-bar";
+
 
 export default function Home() {
   interface Team {
@@ -140,25 +142,17 @@ export default function Home() {
   }, [selectedGameweek]);
 
   return (
+    <>
     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
       <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
+        <div>
+          <NavigationMenuDemo />
+        </div>
         <h1 className="text-2xl font-bold">S.a.G FPL League Standings</h1>
         <div className="flex gap-4 items-center">
           <Button variant="outline" onClick={() => fetchStandings(selectedGameweek)} disabled={loading}>
             {loading ? "Refreshing..." : "Refresh Standings"}
           </Button>
-{/* <Select onValueChange={(value) => setSelectedGameweek(Number(value))}>
-  <SelectTrigger className="w-[180px]">
-    <SelectValue placeholder={`Gameweek ${selectedGameweek}`} />
-  </SelectTrigger>
-  <SelectContent className="max-h-60 overflow-y-auto">
-    {Array.from({ length: 38 }, (_, i) => (
-      <SelectItem key={i + 1} value={(i + 1).toString()}>
-        Gameweek {i + 1}
-      </SelectItem>
-    ))}
-  </SelectContent>
-</Select> */}
 
 <Select onValueChange={(value) => setSelectedGameweek(Number(value))}>
   <SelectTrigger className="w-[180px]">
@@ -206,11 +200,12 @@ export default function Home() {
     Historic League Chart takes long to load, give it some time. 
   </AlertDescription>
 </Alert>
-
+          
         <LineChartComponent />
         <Separator className="my-4" />
         <Profile />
       </main>
     </div>
+    </>
   );
 }
