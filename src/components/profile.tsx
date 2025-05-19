@@ -15,7 +15,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-import { ScrollArea } from "@/components/ui/scroll-area"; 
+// import { ScrollArea } from "@/components/ui/scroll-area"; 
 
 interface Manager {
   entry: number;
@@ -77,7 +77,7 @@ export default function Profile() {
           <SelectTrigger>
             <SelectValue placeholder={loadingManagers ? "Loading managers..." : "Select a manager"} />
           </SelectTrigger>
-          <ScrollArea >
+          {/* <ScrollArea > */}
           <SelectContent className="max-h-60">
             {managers.map((manager) => (
               <SelectItem key={manager.entry} value={String(manager.entry)}>
@@ -85,7 +85,7 @@ export default function Profile() {
               </SelectItem>
             ))}
           </SelectContent>
-          </ScrollArea>
+          {/* </ScrollArea> */}
         </Select>
       </div>
 

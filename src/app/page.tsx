@@ -103,7 +103,7 @@ import { LineChartComponent } from "@/components/line-chart";
 import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import Profile from "@/components/profile";
-import { ScrollArea } from "@/components/ui/scroll-area";
+// import { ScrollArea } from "@/components/ui/scroll-area";
 import { NavigationMenuDemo } from "@/components/nav-bar";
 
 
@@ -160,7 +160,7 @@ export default function Home() {
     <SelectValue placeholder={`Gameweek ${selectedGameweek}`} />
   </SelectTrigger>
   {/* Wrap SelectContent with ScrollArea */}
-<ScrollArea className="max-h-60">
+{/* <ScrollArea className="max-h-60"> */}
   <SelectContent className="max-h-60 overflow-y-auto">
     {Array.from({ length: 38 }, (_, i) => (
       <SelectItem key={i + 1} value={(i + 1).toString()}>
@@ -168,7 +168,7 @@ export default function Home() {
       </SelectItem>
     ))}
   </SelectContent>
-</ScrollArea>
+{/* </ScrollArea> */}
 </Select>
         </div>
         <Table className="w-full max-w-4xl">
