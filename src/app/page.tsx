@@ -115,6 +115,7 @@ export default function Home() {
     player_name: string;
     total: number;
     gameweek_points: number; // New field for points scored in the selected gameweek
+    overall_rank: number; // Added property for overall rank
   }
 
   const [standings, setStandings] = useState<Team[]>([]);
@@ -178,6 +179,7 @@ export default function Home() {
               <TableHead>Manager</TableHead>
               <TableHead>Total Points</TableHead>
               <TableHead>Gameweek Points</TableHead> {/* New column */}
+              <TableHead>Overall Rank</TableHead> {/* New column */}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -188,6 +190,7 @@ export default function Home() {
                 <TableCell>{team.player_name}</TableCell>
                 <TableCell>{team.total}</TableCell>
                 <TableCell>{team.gameweek_points}</TableCell> {/* New data */}
+                <TableCell>{team.overall_rank}</TableCell> {/* New data */}
               </TableRow>
             ))}
           </TableBody>

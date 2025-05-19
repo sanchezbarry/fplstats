@@ -1,73 +1,4 @@
-// import { NextResponse } from "next/server";
 
-// export async function GET() {
-//   try {
-//     const leagueId = "298749"; // Replace with your league ID
-//     const response = await fetch(
-//       `https://fantasy.premierleague.com/api/leagues-classic/${leagueId}/standings/`
-//     );
-
-//     if (!response.ok) {
-//       return NextResponse.json(
-//         { error: "Failed to fetch league standings" },
-//         { status: response.status }
-//       );
-//     }
-
-//     const data = await response.json();
-//     return NextResponse.json(data.standings.results);
-//   } catch (error) {
-//     console.error("Error fetching league standings:", error);
-//     return NextResponse.json(
-//       { error: "Internal Server Error" },
-//       { status: 500 }
-//     );
-//   }
-// }
-
-// import { NextResponse } from "next/server";
-
-// export async function GET(req: Request) {
-//   const { searchParams } = new URL(req.url);
-//   const gameweek = searchParams.get("gameweek") || "1"; // Default to gameweek 1
-
-//   try {
-//     const leagueId = "298749"; // Replace with your league ID
-//     const response = await fetch(
-//       `https://fantasy.premierleague.com/api/leagues-classic/${leagueId}/standings/`
-//     );
-
-//     if (!response.ok) {
-//       return NextResponse.json(
-//         { error: "Failed to fetch league standings" },
-//         { status: response.status }
-//       );
-//     }
-
-//     const data = await response.json();
-
-//     // Simulate gameweek points (replace with actual logic if available)
-//     interface Team {
-//       id: number;
-//       name: string;
-//       total_points: number;
-//       // Add other fields as per the API response
-//     }
-
-//     const standings = data.standings.results.map((team: Team) => ({
-//       ...team,
-//       gameweek_points: Math.floor(Math.random() * 100), // Replace with actual gameweek points logic
-//     }));
-
-//     return NextResponse.json(standings);
-//   } catch (error) {
-//     console.error("Error fetching league standings:", error);
-//     return NextResponse.json(
-//       { error: "Internal Server Error" },
-//       { status: 500 }
-//     );
-//   }
-// }
 
 // import { NextResponse } from "next/server";
 
@@ -90,32 +21,86 @@
 
 //     const data = await response.json();
 
-//     // Simulate gameweek points and calculate total points up to the selected gameweek
+//     // Fetch gameweek-specific data for each team
+//     // const standings = await Promise.all(
+//     //   data.standings.results.map(async (team: { entry: number; id: number; name: string; total_points: number }) => {
+//     //     const entryResponse = await fetch(
+//     //       `https://fantasy.premierleague.com/api/entry/${team.entry}/event/${gameweek}/picks/`
+//     //     );
+
+//     //     if (!entryResponse.ok) {
+//     //       console.error(`Failed to fetch gameweek data for team ${team.entry}`);
+//     //       return {
+//     //         ...team,
+//     //         gameweek_points: 0, // Default to 0 if the fetch fails
+//     //       };
+//     //     }
+
+//     //     const entryData = await entryResponse.json();
+
+//     //     return {
+//     //       ...team,
+//     //       gameweek_points: entryData.entry_history.points, // Points for the selected gameweek
+          
+//     //     };
+//     //   })
+//     // );
+
 //     interface Team {
-//       id: number;
-//       name: string;
-//       total_points: number;
-//       gameweek_points: number[];
-//       // Add other fields as per the API response
+//       entry: number;
+//       entry_name: string;
+//       player_name: string;
+//       rank: number;
+//       total: number;
+//       overall_rank?: number;
+//       entry_rank?: number;
 //     }
 
-//     const standings = data.standings.results.map((team: Team) => {
-//       // Simulate gameweek points for each gameweek (replace with actual logic if available)
-//       const simulatedGameweekPoints = Array.from({ length: 38 }, () =>
-//         Math.floor(Math.random() * 100)
-//       );
+//     const standings = await Promise.all(
+//   data.standings.results.map(async (team: Team) => {
+//     const entryResponse = await fetch(
+//       `https://fantasy.premierleague.com/api/entry/${team.entry}/event/${gameweek}/picks/`
+//     );
 
-//       // Calculate total points up to the selected gameweek
-//       const totalPointsUpToGameweek = simulatedGameweekPoints
-//         .slice(0, gameweek)
-//         .reduce((sum, points) => sum + points, 0);
+//     let gameweek_points = 0;
+//     if (entryResponse.ok) {
+//       const entryData = await entryResponse.json();
+//       gameweek_points = entryData.entry_history.points;
+//     }
 
-//       return {
-//         ...team,
-//         gameweek_points: simulatedGameweekPoints[gameweek - 1], // Points for the selected gameweek
-//         total_points: totalPointsUpToGameweek, // Total points up to the selected gameweek
-//       };
-//     });
+//     return {
+//       entry: team.entry,
+//       entry_name: team.entry_name,
+//       player_name: team.player_name,
+//       rank: team.rank,
+//       total: team.total,
+//       gameweek_points,
+//       overall_rank: team.overall_rank ?? team.entry_rank ?? null, // Add this line
+//     };
+//   })
+// );
+
+//     // ...inside your API handler for /api/standings
+// interface Manager {
+//   entry: number;
+//   entry_name: string;
+//   player_name: string;
+//   rank: number;
+//   total: number;
+//   event_total: number;
+//   overall_rank?: number;
+//   entry_rank?: number;
+// }
+
+// const managers = data.standings?.results?.map((m: Manager) => ({
+//   entry: m.entry,
+//   entry_name: m.entry_name,
+//   player_name: m.player_name,
+//   rank: m.rank,
+//   total: m.total,
+//   gameweek_points: m.event_total,
+//   overall_rank: m.overall_rank ?? m.entry_rank, // Use the correct property
+// })) || [];
 
 //     return NextResponse.json(standings);
 //   } catch (error) {
@@ -131,10 +116,10 @@ import { NextResponse } from "next/server";
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
-  const gameweek = parseInt(searchParams.get("gameweek") || "1", 10); // Default to gameweek 1
+  const gameweek = parseInt(searchParams.get("gameweek") || "1", 10);
 
   try {
-    const leagueId = "298749"; // Replace with your league ID
+    const leagueId = "298749";
     const response = await fetch(
       `https://fantasy.premierleague.com/api/leagues-classic/${leagueId}/standings/`
     );
@@ -148,26 +133,48 @@ export async function GET(req: Request) {
 
     const data = await response.json();
 
-    // Fetch gameweek-specific data for each team
+    interface Team {
+      entry: number;
+      entry_name: string;
+      player_name: string;
+      rank: number;
+      total: number;
+    }
+
     const standings = await Promise.all(
-      data.standings.results.map(async (team: { entry: number; id: number; name: string; total_points: number }) => {
-        const entryResponse = await fetch(
-          `https://fantasy.premierleague.com/api/entry/${team.entry}/event/${gameweek}/picks/`
-        );
+      data.standings.results.map(async (team: Team) => {
+        // Fetch gameweek points
+        let gameweek_points = 0;
+        try {
+          const entryResponse = await fetch(
+            `https://fantasy.premierleague.com/api/entry/${team.entry}/event/${gameweek}/picks/`
+          );
+          if (entryResponse.ok) {
+            const entryData = await entryResponse.json();
+            gameweek_points = entryData.entry_history.points;
+          }
+        } catch {}
 
-        if (!entryResponse.ok) {
-          console.error(`Failed to fetch gameweek data for team ${team.entry}`);
-          return {
-            ...team,
-            gameweek_points: 0, // Default to 0 if the fetch fails
-          };
-        }
-
-        const entryData = await entryResponse.json();
+        // Fetch overall rank
+        let overall_rank = null;
+        try {
+          const summaryResponse = await fetch(
+            `https://fantasy.premierleague.com/api/entry/${team.entry}/`
+          );
+          if (summaryResponse.ok) {
+            const summaryData = await summaryResponse.json();
+            overall_rank = summaryData.summary_overall_rank ?? null;
+          }
+        } catch {}
 
         return {
-          ...team,
-          gameweek_points: entryData.entry_history.points, // Points for the selected gameweek
+          entry: team.entry,
+          entry_name: team.entry_name,
+          player_name: team.player_name,
+          rank: team.rank,
+          total: team.total,
+          gameweek_points,
+          overall_rank,
         };
       })
     );
@@ -181,127 +188,3 @@ export async function GET(req: Request) {
     );
   }
 }
-
-// import { NextResponse } from "next/server";
-
-// export async function GET(req: Request) {
-//   const { searchParams } = new URL(req.url);
-//   const isHistoric = searchParams.get("historic") === "true";
-
-//   try {
-//     const leagueId = "298749"; // Replace with your league ID
-
-//     if (isHistoric) {
-//       // Fetch league standings for all gameweeks (1–38)
-//       const historicStandings = await Promise.all(
-//         Array.from({ length: 38 }, (_, i) => i + 1).map(async (gameweek) => {
-//           const response = await fetch(
-//             `https://fantasy.premierleague.com/api/leagues-classic/${leagueId}/standings/`
-//           );
-
-//           if (!response.ok) {
-//             console.error(`Failed to fetch standings for gameweek ${gameweek}`);
-//             return [];
-//           }
-
-//           const data = await response.json();
-
-//           // Map standings to include gameweek and rank
-//           return data.standings.results.map((team: { entry_name: string; rank: number }) => ({
-//             gameweek,
-//             entry_name: team.entry_name,
-//             rank: team.rank,
-//           }));
-//         })
-//       );
-
-//       // Flatten the array of gameweek standings
-//       const flattenedStandings = historicStandings.flat();
-
-//       return NextResponse.json(flattenedStandings);
-//     }
-
-//     // Default behavior for current standings
-//     const response = await fetch(
-//       `https://fantasy.premierleague.com/api/leagues-classic/${leagueId}/standings/`
-//     );
-
-//     if (!response.ok) {
-//       return NextResponse.json(
-//         { error: "Failed to fetch league standings" },
-//         { status: response.status }
-//       );
-//     }
-
-//     const data = await response.json();
-//     return NextResponse.json(data.standings.results);
-//   } catch (error) {
-//     console.error("Error fetching league standings:", error);
-//     return NextResponse.json(
-//       { error: "Internal Server Error" },
-//       { status: 500 }
-//     );
-//   }
-// }
-
-// import { NextResponse } from "next/server";
-
-// export async function GET(req: Request) {
-//   const { searchParams } = new URL(req.url);
-//   const isHistoric = searchParams.get("historic") === "true";
-
-//   try {
-//     const leagueId = "298749"; // Replace with your league ID
-
-//     if (isHistoric) {
-//       // Fetch league standings for all gameweeks (1–38)
-//       const historicStandings = await Promise.all(
-//         Array.from({ length: 38 }, (_, i) => i + 1).map(async (gameweek) => {
-//           const response = await fetch(
-//             `https://fantasy.premierleague.com/api/leagues-classic/${leagueId}/standings/`
-//           );
-
-//           if (!response.ok) {
-//             console.error(`Failed to fetch standings for gameweek ${gameweek}`);
-//             return [];
-//           }
-
-//           const data = await response.json();
-
-//           // Map standings to include gameweek and rank
-//           return data.standings.results.map((team: { entry_name: string; rank: number }) => ({
-//             gameweek,
-//             entry_name: team.entry_name,
-//             rank: team.rank,
-//           }));
-//         })
-//       );
-
-//       // Flatten the array of gameweek standings
-//       const flattenedStandings = historicStandings.flat();
-
-//       return NextResponse.json(flattenedStandings);
-//     }
-
-//     // Default behavior for current standings
-//     const response = await fetch(
-//       `https://fantasy.premierleague.com/api/leagues-classic/${leagueId}/standings/`
-//     );
-
-//     if (!response.ok) {
-//       return NextResponse.json(
-//         { error: "Failed to fetch league standings" },
-//         { status: response.status }
-//       );
-//     }
-
-//     const data = await response.json();
-//     return NextResponse.json(data.standings.results);
-//   } catch (error) {
-//     console.error("Error fetching league standings:", error);
-//     return NextResponse.json(
-//       { error: "Internal Server Error" },
-//       { status: 500 }
-//     );
-//   }
-// }
