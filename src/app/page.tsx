@@ -105,7 +105,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import Profile from "@/components/profile";
 // import { ScrollArea } from "@/components/ui/scroll-area";
 import { NavigationMenuDemo } from "@/components/nav-bar";
-
+import Footer from "@/components/footer";
 
 export default function Home() {
   interface Team {
@@ -207,8 +207,10 @@ export default function Home() {
         <LineChartComponent />
         <Separator className="my-4" />
         <Profile />
+  
       </main>
     </div>
+    <Footer />
     </>
   );
 }
