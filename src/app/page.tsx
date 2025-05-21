@@ -175,10 +175,10 @@ export default function Home() {
           <TableHeader>
             <TableRow>
               <TableHead>Rank</TableHead>
-              <TableHead>Team Name</TableHead>
-              <TableHead>Manager</TableHead>
-              <TableHead>Total Points</TableHead>
-              <TableHead>Gameweek Points</TableHead> {/* New column */}
+              <TableHead>Team</TableHead>
+              <TableHead className="hidden sm:table-cell">Manager</TableHead>
+              <TableHead>Total Pts</TableHead>
+              <TableHead>GW Pts</TableHead> {/* New column */}
               <TableHead>Overall Rank</TableHead> {/* New column */}
             </TableRow>
           </TableHeader>
@@ -187,7 +187,7 @@ export default function Home() {
               <TableRow key={team.entry}>
                 <TableCell>{team.rank}</TableCell>
                 <TableCell>{team.entry_name}</TableCell>
-                <TableCell>{team.player_name}</TableCell>
+                <TableCell className="hidden sm:table-cell">{team.player_name}</TableCell>
                 <TableCell>{team.total}</TableCell>
                 <TableCell>{team.gameweek_points}</TableCell> {/* New data */}
                 <TableCell>{team.overall_rank}</TableCell> {/* New data */}

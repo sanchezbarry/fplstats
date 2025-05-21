@@ -107,21 +107,21 @@ export function NavigationMenuDemo() {
           </NavigationMenuContent>
         </NavigationMenuItem> */}
         <NavigationMenuItem>
-          <Link href="#" legacyBehavior passHref>
+          <Link href="#" passHref>
             <NavigationMenuLink className={navigationMenuTriggerStyle()}>
               Home
             </NavigationMenuLink>
           </Link>
         </NavigationMenuItem>
                 <NavigationMenuItem>
-          <Link href="#line-chart" legacyBehavior passHref>
+          <Link href="#line-chart" passHref>
             <NavigationMenuLink className={navigationMenuTriggerStyle()}>
               League Standings over GWs
             </NavigationMenuLink>
           </Link>
         </NavigationMenuItem>
                 <NavigationMenuItem>
-          <Link href="#profile" legacyBehavior passHref>
+          <Link href="#profile" passHref>
             <NavigationMenuLink className={navigationMenuTriggerStyle()}>
               Manager Profile (See your history)
             </NavigationMenuLink>
