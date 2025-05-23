@@ -106,13 +106,7 @@ export function NavigationMenuDemo() {
             </ul>
           </NavigationMenuContent>
         </NavigationMenuItem> */}
-        <NavigationMenuItem>
-          <Link href="#" passHref>
-            <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-              Home
-            </NavigationMenuLink>
-          </Link>
-        </NavigationMenuItem>
+
                 <NavigationMenuItem>
           <Link href="#line-chart" passHref>
             <NavigationMenuLink className={navigationMenuTriggerStyle()}>
@@ -124,6 +118,14 @@ export function NavigationMenuDemo() {
           <Link href="#profile" passHref>
             <NavigationMenuLink className={navigationMenuTriggerStyle()}>
               Manager Profile (See your history)
+            </NavigationMenuLink>
+          </Link>
+        </NavigationMenuItem>
+
+                <NavigationMenuItem>
+          <Link href="#herewego" passHref>
+            <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+              Here We Go!
             </NavigationMenuLink>
           </Link>
         </NavigationMenuItem>
