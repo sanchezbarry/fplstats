@@ -102,7 +102,7 @@ export default function HereWeGo() {
               <TableHead>Player In</TableHead>
               <TableHead>Player Out</TableHead>
               {/* <TableHead>Time</TableHead> */}
-              <TableHead>Cost</TableHead>
+              {/* <TableHead>Cost</TableHead> */}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -119,7 +119,7 @@ export default function HereWeGo() {
 <TableCell>{playerMap[String(t.player_in)] || t.player_in}</TableCell>
 <TableCell>{playerMap[String(t.player_out)] || t.player_out}</TableCell>
                   {/* <TableCell>{new Date(t.time).toLocaleString()}</TableCell> */}
-<TableCell>{t.cost ? t.cost / 10 : 0}</TableCell>
+{/* <TableCell>{t.cost ? t.cost / 10 : 0}</TableCell> */}
                 </TableRow>
               ))
             )}

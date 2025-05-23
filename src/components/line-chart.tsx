@@ -86,7 +86,7 @@ export function LineChartComponent() {
   }, []);
 
   return (
-    <Card id="line-chart" className="w-full max-w-6xl h-[600px]">
+    <Card id="line-chart" className="w-full max-w-6xl h-[625px]">
       {loading && (
         <div className="w-full px-8 pt-8">
           <Progress value={progress} />
