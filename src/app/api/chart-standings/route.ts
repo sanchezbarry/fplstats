@@ -15,9 +15,11 @@ async function fetchWithRetry(url: string, retries = 3, delay = 1000): Promise<u
   throw new Error(`Failed to fetch ${url} after ${retries} retries`);
 }
 
-export async function GET() {
+export async function GET(req: Request) {
+  const { searchParams } = new URL(req.url);
   try {
-    const leagueId = "298749";
+    
+    const leagueId = searchParams.get("league_id") || "867909";
     // 1. Get all managers in the league (first 50, or fetch all pages if needed)
     const leagueResponse = await fetchWithRetry(
       `https://fantasy.premierleague.com/api/leagues-classic/${leagueId}/standings/`

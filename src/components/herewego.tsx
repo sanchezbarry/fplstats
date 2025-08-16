@@ -25,7 +25,11 @@ interface Transfer {
   cost: number;
 }
 
-export default function HereWeGo() {
+interface HereWeGoProps {
+  leagueId: string;
+}
+
+export default function HereWeGo({ leagueId }: HereWeGoProps) {
   const [gameweek, setGameweek] = useState<number | null>(null);
   const [transfers, setTransfers] = useState<Transfer[]>([]);
   const [loading, setLoading] = useState(false);
@@ -34,6 +38,9 @@ export default function HereWeGo() {
   // Fetch player names and latest gameweek on mount
   useEffect(() => {
     async function fetchPlayersAndGW() {
+
+      
+      // const res = await fetch(`/api/transfers?league_id=${leagueId}`);
       const res = await fetch("https://fantasy.premierleague.com/api/bootstrap-static/");
       const data = await res.json();
       // Build player ID -> name map (string keys)
@@ -60,24 +67,25 @@ export default function HereWeGo() {
       setGameweek(latest ? latest.id : 1);
     }
     fetchPlayersAndGW();
-  }, []);
+  }, [leagueId]);
 
   // Fetch transfers when gameweek changes
   useEffect(() => {
     if (!gameweek) return;
     setLoading(true);
-    fetch(`/api/transfers?gameweek=${gameweek}`)
+    fetch(`/api/transfers?league_id=${leagueId}&gameweek=${gameweek}`)
       .then((res) => res.json())
       .then((data) => {
         setTransfers(data);
         setLoading(false);
       })
       .catch(() => setLoading(false));
-  }, [gameweek]);
+  }, [gameweek,leagueId]);
 
   return (
     <div id="herewego" className="max-w-2xl mx-auto p-4">
-      <h2 className="text-xl font-bold mb-4">Here we go!</h2>
+      <h2 className="text-xl font-bold mb-2">Here we go!</h2>
+      <p className="mb-4">Note: You can only see transfers of a gameweek after the gameweek has passed.</p>
       <div className="mb-4">
         <Select value={gameweek ? String(gameweek) : ""} onValueChange={val => setGameweek(Number(val))}>
           <SelectTrigger className="w-[180px]">

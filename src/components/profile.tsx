@@ -65,6 +65,7 @@ export default function Profile() {
   return (
     <div id="profile" className="max-w-xl mx-auto p-4">
       <h2 className="text-xl font-bold mb-4">Manager Profile</h2>
+      <p className="mb-4">See a manager&#39;s past performance</p>
       <div className="mb-6">
         <Select
           onValueChange={(val) => {

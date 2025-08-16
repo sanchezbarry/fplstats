@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Progress } from "@/components/ui/progress";
-import { CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts";
+import { CartesianGrid, Line, LineChart as RechartsLineChart, XAxis, YAxis } from "recharts";
 import {
   Card,
   CardContent,
@@ -20,7 +20,12 @@ interface ManagerData {
   [manager: string]: number | undefined; // manager name to rank
 }
 
-export function LineChartComponent() {
+interface LineChartProps {
+  leagueId: string;
+}
+
+export default function LineChartComponent({ leagueId }: LineChartProps) {
+  // const [chartData, setChartData] = useState<any>(null);
   const [chartData, setChartData] = useState<ManagerData[]>([]);
   const [chartConfig, setChartConfig] = useState<Record<string, { label: string; color: string }>>({});
   const [loading, setLoading] = useState(true);
@@ -31,7 +36,7 @@ export function LineChartComponent() {
       try {
         setLoading(true);
         setProgress(0);
-        const response = await fetch("/api/chart-standings");
+        const response = await fetch(`/api/chart-standings?league_id=${leagueId}`);
         if (!response.ok) throw new Error("Failed to fetch historic data");
         const data = await response.json();
 
@@ -83,7 +88,7 @@ export function LineChartComponent() {
     }
 
     fetchHistoricData();
-  }, []);
+  }, [leagueId]);
 
   return (
     <Card id="line-chart" className="w-full max-w-6xl h-[625px]">
@@ -103,9 +108,7 @@ export function LineChartComponent() {
             <ChartContainer 
             
             config={chartConfig}>
-              <LineChart
-              
-                accessibilityLayer
+              <RechartsLineChart
                 data={chartData}
                 margin={{
                   left: 12,
@@ -152,7 +155,7 @@ export function LineChartComponent() {
                     dot={false}
                   />
                 ))}
-              </LineChart>
+              </RechartsLineChart>
             </ChartContainer>
           </CardContent>
           <CardFooter>

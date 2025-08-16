@@ -1,92 +1,3 @@
-// 'use client';
-
-// import { useEffect, useState } from "react";
-// import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../components/ui/table";
-// import { Button } from "@/components/ui/button";
-// import {
-//   Select,
-//   SelectContent,
-//   SelectItem,
-//   SelectTrigger,
-//   SelectValue,
-// } from "@/components/ui/select"
-
-
-// export default function Home() {
-//   interface Team {
-//     entry: number;
-//     rank: number;
-//     entry_name: string;
-//     player_name: string;
-//     total: number;
-//   }
-
-//   const [standings, setStandings] = useState<Team[]>([]);
-//   const [loading, setLoading] = useState(false);
-
-//   const fetchStandings = async () => {
-//     setLoading(true);
-//     try {
-//       const response = await fetch("/api/standings");
-//       if (!response.ok) {
-//         throw new Error("Failed to fetch standings");
-//       }
-//       const data = await response.json();
-//       setStandings(data);
-//     } catch (error) {
-//       console.error("Error fetching league standings:", error);
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   useEffect(() => {
-//     fetchStandings();
-//   }, []);
-
-//   return (
-//     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-//       <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-//         <h1 className="text-2xl font-bold">FPL League Standings</h1>
-//         <Button variant="outline" onClick={fetchStandings} disabled={loading}>
-//           {loading ? "Refreshing..." : "Refresh Standings"}
-//         </Button>
-//         <Select>
-//         <SelectTrigger className="w-[180px]">
-//           <SelectValue placeholder="Theme" />
-//         </SelectTrigger>
-//         <SelectContent>
-//           <SelectItem value="light">Light</SelectItem>
-//           <SelectItem value="dark">Dark</SelectItem>
-//           <SelectItem value="system">System</SelectItem>
-//         </SelectContent>
-//       </Select>
-
-//         <Table className="w-full max-w-4xl">
-//           <TableHeader>
-//             <TableRow>
-//               <TableHead>Rank</TableHead>
-//               <TableHead>Team Name</TableHead>
-//               <TableHead>Manager</TableHead>
-//               <TableHead>Points</TableHead>
-//             </TableRow>
-//           </TableHeader>
-//           <TableBody>
-//             {standings.map((team) => (
-//               <TableRow key={team.entry}>
-//                 <TableCell>{team.rank}</TableCell>
-//                 <TableCell>{team.entry_name}</TableCell>
-//                 <TableCell>{team.player_name}</TableCell>
-//                 <TableCell>{team.total}</TableCell>
-//               </TableRow>
-//             ))}
-//           </TableBody>
-//         </Table>
-//       </main>
-//     </div>
-//   );
-// }
-
 'use client';
 
 import { useEffect, useState } from "react";
@@ -99,7 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { LineChartComponent } from "@/components/line-chart";
+import LineChartComponent from "@/components/line-chart";
 import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import Profile from "@/components/profile";
@@ -108,7 +19,7 @@ import HereWeGo from "@/components/herewego";
 import { NavigationMenuDemo } from "@/components/nav-bar";
 import Footer from "@/components/footer";
 import BackToTopButton from "@/components/backtotop";
-
+import { Input } from "@/components/ui/input";
 
 export default function Home() {
   interface Team {
@@ -121,6 +32,23 @@ export default function Home() {
     overall_rank: number; // Added property for overall rank
   }
 
+  //set league id
+  //   const [leagueId, setLeagueId] = useState(() => {
+  //   if (typeof window !== "undefined") {
+  //     return localStorage.getItem("league_id") || "867909";
+  //   }
+  //   return "867909";
+  // });
+
+  const [leagueId, setLeagueId] = useState("867909");
+  
+useEffect(() => {
+  if (typeof window !== "undefined") {
+    localStorage.setItem("league_id", leagueId);
+  }
+}, [leagueId]);
+
+
   const [standings, setStandings] = useState<Team[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedGameweek, setSelectedGameweek] = useState(1); // Default to gameweek 1
@@ -128,7 +56,8 @@ export default function Home() {
   const fetchStandings = async (gameweek: number) => {
     setLoading(true);
     try {
-      const response = await fetch(`/api/standings?gameweek=${gameweek}`);
+    const response = await fetch(`/api/standings?gameweek=${gameweek}&league_id=${leagueId}`);
+
       if (!response.ok) {
         throw new Error("Failed to fetch standings");
       }
@@ -142,8 +71,23 @@ export default function Home() {
   };
 
   useEffect(() => {
-    fetchStandings(selectedGameweek);
-  }, [selectedGameweek]);
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const response = await fetch(`/api/standings?gameweek=${selectedGameweek}&league_id=${leagueId}`);
+        if (!response.ok) {
+          throw new Error("Failed to fetch standings");
+        }
+        const data = await response.json();
+        setStandings(data);
+      } catch (error) {
+        console.error("Error fetching league standings:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [selectedGameweek, leagueId]);
 
   return (
     <>
@@ -154,6 +98,16 @@ export default function Home() {
           <Separator className="my-4" />
         </div>
         <h1 className="text-2xl font-bold">S.a.G FPL League Standings</h1>
+        <p>Want to take a look at anothe league? Enter league ID here.</p>
+              <div className="mb-4 flex gap-2 items-center">
+        <Input
+          className="w-[200px]"
+          placeholder="Enter League ID"
+          value={leagueId}
+          onChange={e => setLeagueId(e.target.value)}
+        />
+        {/* <span className="text-xs text-muted-foreground">Default: 298749</span> */}
+      </div>
         <div className="flex gap-4 items-center">
           <Button variant="outline" onClick={() => fetchStandings(selectedGameweek)} disabled={loading}>
             {loading ? "Refreshing..." : "Refresh Standings"}
@@ -208,9 +162,9 @@ export default function Home() {
   </AlertDescription>
 </Alert>
           
-        <LineChartComponent />
+        <LineChartComponent leagueId={leagueId} />
         <Separator className="my-4" />
-        <HereWeGo />
+        <HereWeGo leagueId={leagueId} />
         <Separator className="my-4" />
         <Profile />
         
