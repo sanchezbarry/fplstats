@@ -117,7 +117,7 @@ export function NavigationMenuDemo() {
                 <NavigationMenuItem>
           <Link href="#profile" passHref>
             <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-              Manager Profile (See your history)
+              Manager Profile (See past seasons)
             </NavigationMenuLink>
           </Link>
         </NavigationMenuItem>

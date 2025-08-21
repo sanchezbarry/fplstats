@@ -47,9 +47,6 @@ export default function Faq() {
           <p>
             This is for general league data such as high scoring players, dream teams, etc.
           </p>
-          <p>
-            This page is under construction and will be updated soon.
-          </p>
         </AccordionContent>
       </AccordionItem>
     </Accordion>
