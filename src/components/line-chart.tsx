@@ -152,7 +152,7 @@ export default function LineChartComponent({ leagueId }: LineChartProps) {
                     type="monotone"
                     stroke={chartConfig[key].color}
                     strokeWidth={2}
-                    dot={false}
+                    dot={true}
                   />
                 ))}
               </RechartsLineChart>

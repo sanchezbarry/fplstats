@@ -30,7 +30,10 @@ interface SeasonHistory {
   points_on_bench: number;
 }
 
-export default function Profile() {
+interface ProfileProps {
+  leagueId: string;
+}
+export default function Profile({ leagueId }: ProfileProps) {
   const [managers, setManagers] = useState<Manager[]>([]);
   const [selectedManager, setSelectedManager] = useState<Manager | null>(null);
   const [seasonHistory, setSeasonHistory] = useState<SeasonHistory[]>([]);
@@ -38,16 +41,29 @@ export default function Profile() {
   const [loadingHistory, setLoadingHistory] = useState(false);
 
   // Fetch managers from league
-  useEffect(() => {
-    setLoadingManagers(true);
-    fetch("/api/standings")
-      .then((res) => res.json())
-      .then((data) => {
-        setManagers(data);
-        setLoadingManagers(false);
-      })
-      .catch(() => setLoadingManagers(false));
-  }, []);
+useEffect(() => {
+  setLoadingManagers(true);
+  fetch(`/api/standings?league_id=${leagueId}`)
+    .then((res) => res.json())
+    .then((data) => {
+      setManagers(data);
+      setLoadingManagers(false);
+      setSelectedManager(null); // Reset selected manager when league changes
+      setSeasonHistory([]);     // Reset history
+    })
+    .catch(() => setLoadingManagers(false));
+}, [leagueId]);
+
+  // useEffect(() => {
+  //   setLoadingManagers(true);
+  //   fetch("/api/standings")
+  //     .then((res) => res.json())
+  //     .then((data) => {
+  //       setManagers(data);
+  //       setLoadingManagers(false);
+  //     })
+  //     .catch(() => setLoadingManagers(false));
+  // }, []);
 
   // Fetch manager history when selected
   useEffect(() => {
