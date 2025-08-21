@@ -1,15 +1,7 @@
 'use client';
 
 import { useEffect, useState } from "react";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../components/ui/table";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import LineChartComponent from "@/components/line-chart";
 import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
@@ -22,7 +14,6 @@ import Footer from "@/components/footer";
 import BackToTopButton from "@/components/backtotop";
 import { Input } from "@/components/ui/input";
 import { AppSidebar } from "@/components/app-sidebar";
-import App from "next/app";
 import {
   SidebarInset,
   SidebarProvider,
@@ -40,13 +31,6 @@ export default function Home() {
     overall_rank: number; // Added property for overall rank
   }
 
-  //set league id
-  //   const [leagueId, setLeagueId] = useState(() => {
-  //   if (typeof window !== "undefined") {
-  //     return localStorage.getItem("league_id") || "867909";
-  //   }
-  //   return "867909";
-  // });
 
   const [leagueId, setLeagueId] = useState("867909");
   
