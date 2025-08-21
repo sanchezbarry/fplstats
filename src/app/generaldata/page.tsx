@@ -4,8 +4,19 @@ import { useState, useEffect } from "react";
 
 export default function GeneralData() {
   const [selectedGameweek, setSelectedGameweek] = useState(1);
-  const [dreamTeam, setDreamTeam] = useState<any[]>([]);
-  const [players, setPlayers] = useState<any[]>([]);
+  interface DreamTeamPlayer {
+    element: number;
+    points: number;
+    // Add other properties if needed, e.g. position: string;
+  }
+
+  const [dreamTeam, setDreamTeam] = useState<DreamTeamPlayer[]>([]);
+  interface Player {
+    id: number;
+    web_name: string;
+    // Add other properties as needed from the API response
+  }
+  const [players, setPlayers] = useState<Player[]>([]);
   const [loading, setLoading] = useState(false);
 
   // Fetch all FPL players once
@@ -63,7 +74,7 @@ useEffect(() => {
         <div className="w-full max-w-xl">
           <h2 className="text-xl font-semibold mb-2">Dream Team - Gameweek {selectedGameweek}</h2>
           <ul className="space-y-2">
-            {dreamTeam.map((player: any) => (
+            {dreamTeam.map((player: DreamTeamPlayer) => (
               <li key={player.element}>
                 <span className="font-bold">{getPlayerName(player.element)}</span>
                 {" "}
