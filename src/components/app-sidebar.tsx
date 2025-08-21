@@ -42,17 +42,17 @@ const data = {
   navMain: [
     {
       title: "League Viewer",
-      url: "#",
+      url: "/",
       icon: IconDashboard,
     },
     {
       title: "General FPL Data",
-      url: "#",
+      url: "/generaldata",
       icon: IconListDetails,
     },
     {
       title: "FAQ",
-      url: "#",
+      url: "/faq",
       icon: IconChartBar,
     },
     // {
@@ -160,7 +160,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               asChild
               className="data-[slot=sidebar-menu-button]:!p-1.5"
             >
-              <a href="#">
+              <a href="/">
                 <IconInnerShadowTop className="!size-5" />
                 <span className="text-base font-semibold">FPL</span>
               </a>

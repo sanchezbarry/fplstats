@@ -20,6 +20,7 @@ import {
 interface Manager {
   entry: number;
   entry_name: string;
+  player_name?: string;
 }
 
 interface SeasonHistory {
@@ -95,13 +96,13 @@ useEffect(() => {
             <SelectValue placeholder={loadingManagers ? "Loading managers..." : "Select a manager"} />
           </SelectTrigger>
           {/* <ScrollArea > */}
-          <SelectContent className="max-h-60">
-            {managers.map((manager) => (
-              <SelectItem key={manager.entry} value={String(manager.entry)}>
-                {manager.entry_name}
-              </SelectItem>
-            ))}
-          </SelectContent>
+<SelectContent className="max-h-60">
+  {managers.map((manager) => (
+    <SelectItem key={manager.entry} value={String(manager.entry)}>
+      {manager.entry_name} {manager.player_name ? `(${manager.player_name})` : ""}
+    </SelectItem>
+  ))}
+</SelectContent>
           {/* </ScrollArea> */}
         </Select>
       </div>

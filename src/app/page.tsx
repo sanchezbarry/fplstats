@@ -10,15 +10,9 @@ import HereWeGo from "@/components/herewego";
 // import { ScrollArea } from "@/components/ui/scroll-area";
 import { NavigationMenuDemo } from "@/components/nav-bar";
 import LeagueTable from "@/components/league-table";
-import Footer from "@/components/footer";
 import BackToTopButton from "@/components/backtotop";
 import { Input } from "@/components/ui/input";
-import { AppSidebar } from "@/components/app-sidebar";
-import {
-  SidebarInset,
-  SidebarProvider,
-} from "@/components/ui/sidebar"
-import { SiteHeader } from "@/components/site-header";
+
 
 export default function Home() {
   interface Team {
@@ -89,17 +83,7 @@ useEffect(() => {
 
   return (
     <>
-                <SidebarProvider
-      style={
-        {
-          "--sidebar-width": "calc(var(--spacing) * 72)",
-          "--header-height": "calc(var(--spacing) * 12)",
-        } as React.CSSProperties
-      }
-    >
-      <AppSidebar variant="inset" />
-      <SidebarInset>
-        <SiteHeader />
+
     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen pb-20 sm:px-5 px-2.5 gap-16 font-[family-name:var(--font-geist-sans)]">
       <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
 
@@ -145,10 +129,7 @@ useEffect(() => {
 
       </main>
     </div>
-       <Footer />
-                </SidebarInset>
-    </SidebarProvider>
- 
+
     <BackToTopButton />
 
     </>
