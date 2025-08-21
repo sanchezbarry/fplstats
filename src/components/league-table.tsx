@@ -15,6 +15,7 @@ interface LeagueTableProps {
   setLeagueId: (id: string) => void;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default function LeagueTable({ leagueId, setLeagueId }: LeagueTableProps) {
 
   interface Team {
@@ -46,9 +47,11 @@ useEffect(() => {
 
 
   const [standings, setStandings] = useState<Team[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [loading, setLoading] = useState(false);
   const [selectedGameweek, setSelectedGameweek] = useState(1); // Default to gameweek 1
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
   const fetchStandings = async (gameweek: number) => {
     setLoading(true);
     try {

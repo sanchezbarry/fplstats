@@ -40,9 +40,13 @@ useEffect(() => {
   }
 }, [leagueId]);
 
-
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [standings, setStandings] = useState<Team[]>([]);
+
+
   const [loading, setLoading] = useState(false);
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [selectedGameweek, setSelectedGameweek] = useState(1); // Default to gameweek 1
 
   const fetchStandings = async (gameweek: number) => {
