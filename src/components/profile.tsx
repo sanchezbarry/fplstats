@@ -15,6 +15,18 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+
+import Image from "next/image";
+
+
+
 // import { ScrollArea } from "@/components/ui/scroll-area"; 
 
 interface Manager {
@@ -31,15 +43,48 @@ interface SeasonHistory {
   points_on_bench: number;
 }
 
+interface ManagerSummary {
+  id: number;
+  name: string; // Team name
+  player_first_name: string;
+  player_last_name: string;
+  joined_time: string; // ISO timestamp
+  favourite_team: number; // team ID (not the name, needs mapping)
+  started_event: number;
+  player_region_name: string;
+  player_region_iso_code_short: string;
+  player_region_iso_code_long: string;
+  summary_overall_points: number;
+  summary_overall_rank: number;
+  summary_event_points: number;
+  summary_event_rank: number;
+  current_event: number;
+  kit: string;
+  name_change_blocked: boolean;
+}
+
 interface ProfileProps {
   leagueId: string;
 }
 export default function Profile({ leagueId }: ProfileProps) {
   const [managers, setManagers] = useState<Manager[]>([]);
-  const [selectedManager, setSelectedManager] = useState<Manager | null>(null);
-  const [seasonHistory, setSeasonHistory] = useState<SeasonHistory[]>([]);
+  const [selectedManager, setSelectedManager] = useState<Manager | null>(null); 
+  const [seasonHistory, setSeasonHistory] = useState<SeasonHistory[]>([]); // array
+  const [managerProfile, setManagerProfile] = useState<ManagerSummary | null>(null); //object not array
   const [loadingManagers, setLoadingManagers] = useState(false);
   const [loadingHistory, setLoadingHistory] = useState(false);
+  const [loadingProfile, setLoadingProfile] = useState(false);
+
+  const [teams, setTeams] = useState<Record<number, { name: string; short_name: string; badge: string }>>({});
+
+
+  //get teams
+  useEffect(() => {
+  fetch("/api/teams")
+    .then((res) => res.json())
+    .then((data) => setTeams(data))
+    .catch((err) => console.error("Failed to load teams", err));
+}, []);
 
   // Fetch managers from league
 useEffect(() => {
@@ -51,6 +96,7 @@ useEffect(() => {
       setLoadingManagers(false);
       setSelectedManager(null); // Reset selected manager when league changes
       setSeasonHistory([]);     // Reset history
+      setManagerProfile(null); 
     })
     .catch(() => setLoadingManagers(false));
 }, [leagueId]);
@@ -77,18 +123,35 @@ useEffect(() => {
         setLoadingHistory(false);
       })
       .catch(() => setLoadingHistory(false));
+      // console.log("Fetching history for manager ID:", seasonHistory.season_name);
+  }, [selectedManager]);
+
+    // Fetch manager summary when selected
+  useEffect(() => {
+    if (!selectedManager) return;
+    setLoadingHistory(true);
+    fetch(`/api/profilesummary?manager_id=${selectedManager.entry}`)
+      .then((res) => res.json())
+      .then((data) => {
+        setManagerProfile(data);   
+        setLoadingProfile(false);
+        
+      })
+      .catch(() => setLoadingProfile(false));
+      console.log("Fetching profile for manager ID:", selectedManager.entry);
   }, [selectedManager]);
 
   return (
     <div id="profile" className="max-w-xl mx-auto p-4">
       <h2 className="text-xl font-bold mb-4">Manager Profile</h2>
-      <p className="mb-4">See a manager&#39;s past performance</p>
+      <p className="mb-4">See a manager&#39;s profile & past performance.</p>
       <div className="mb-6">
         <Select
           onValueChange={(val) => {
             const manager = managers.find((m) => String(m.entry) === val);
             setSelectedManager(manager || null);
             setSeasonHistory([]);
+            setManagerProfile(null);
           }}
           disabled={loadingManagers}
         >
@@ -108,7 +171,54 @@ useEffect(() => {
       </div>
 
       {selectedManager && (
-        <div>
+        <>
+
+
+          <div>
+          <Card className="mt-6">
+        <CardHeader>
+          <CardTitle>{selectedManager.player_name}&apos;s Profile</CardTitle>
+          <CardDescription>{selectedManager.entry_name}</CardDescription>
+        </CardHeader>
+        <CardContent>
+{loadingProfile ? (
+  <div>Loading profile...</div>
+) : !managerProfile ? (
+  <div>No profile found.</div>
+) : (
+
+  <div key={managerProfile.id}>
+
+Favourite Team: {teams[managerProfile.favourite_team] ? (
+    <>
+      <Image
+        src={teams[managerProfile.favourite_team].badge}
+        alt={teams[managerProfile.favourite_team].name}
+        width={36}
+        height={36}
+        className="rounded-full object-contain"
+      />
+      <span>{teams[managerProfile.favourite_team].name}</span>
+    </>
+  ) : (
+    "Unknown"
+  )}
+<br />
+Region: {managerProfile.player_region_name}
+<br />
+Joined: {new Date(managerProfile.joined_time).toLocaleDateString()}
+<br />
+Season&apos;s Points: {managerProfile.summary_overall_points}
+     <br />
+Season&apos;s Rank: {managerProfile.summary_overall_rank}
+  </div>
+
+)}
+        </CardContent>
+        </Card>
+      </div>
+
+                  <div className="mt-6">
           <h3 className="text-lg font-semibold mb-2">
             {selectedManager.entry_name}&#39;s Season History
           </h3>
@@ -139,6 +249,7 @@ useEffect(() => {
             </Table>
           )}
         </div>
+       </>
       )}
     </div>
   );

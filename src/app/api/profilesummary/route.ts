@@ -9,22 +9,25 @@ export async function GET(req: Request) {
 
   try {
     const response = await fetch(
-      `https://fantasy.premierleague.com/api/entry/${managerId}/history/`
+      `https://fantasy.premierleague.com/api/entry/${managerId}/`
     );
     if (!response.ok) {
       return NextResponse.json(
-        { error: "Failed to fetch manager history" },
+        { error: "Failed to fetch manager summary" },
         { status: response.status }
       );
+      
     }
     const data = await response.json();
-        console.log(data)
+    console.log(data)
     return NextResponse.json(data);
+    
   } catch (error) {
-    console.error("Error fetching manager history:", error);
+    console.error("Error fetching manager summary:", error);
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 }
     );
+    
   }
 }
