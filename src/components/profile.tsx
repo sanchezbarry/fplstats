@@ -43,6 +43,24 @@ interface SeasonHistory {
   points_on_bench: number;
 }
 
+interface PlayerPick {
+  element: number;          // player ID
+  position: number;         // lineup position (1-15)
+  multiplier: number;       // 0 if bench, >0 if starting
+  is_captain: boolean;
+  is_vice_captain: boolean;
+}
+
+interface Player {
+  id: number;
+  web_name: string;      // short display name (e.g. "Haaland")
+  first_name: string;
+  second_name: string;
+  team: number;          // maps to team.id
+  photo: string;         // e.g. "12345.jpg"
+  element_type: number;  // 1 GK, 2 DEF, 3 MID, 4 FWD
+}
+
 interface ManagerSummary {
   id: number;
   name: string; // Team name
@@ -71,9 +89,14 @@ export default function Profile({ leagueId }: ProfileProps) {
   const [selectedManager, setSelectedManager] = useState<Manager | null>(null); 
   const [seasonHistory, setSeasonHistory] = useState<SeasonHistory[]>([]); // array
   const [managerProfile, setManagerProfile] = useState<ManagerSummary | null>(null); //object not array
+  const [latestTeam, setLatestTeam] = useState<PlayerPick[]>([]);
+  const [players, setPlayers] = useState<Record<number, Player>>({});
+
   const [loadingManagers, setLoadingManagers] = useState(false);
   const [loadingHistory, setLoadingHistory] = useState(false);
   const [loadingProfile, setLoadingProfile] = useState(false);
+  
+  
 
   const [teams, setTeams] = useState<Record<number, { name: string; short_name: string; badge: string }>>({});
 
@@ -101,16 +124,23 @@ useEffect(() => {
     .catch(() => setLoadingManagers(false));
 }, [leagueId]);
 
-  // useEffect(() => {
-  //   setLoadingManagers(true);
-  //   fetch("/api/standings")
-  //     .then((res) => res.json())
-  //     .then((data) => {
-  //       setManagers(data);
-  //       setLoadingManagers(false);
-  //     })
-  //     .catch(() => setLoadingManagers(false));
-  // }, []);
+//get all players once
+useEffect(() => {
+  fetch("https://fantasy.premierleague.com/api/bootstrap-static/")
+    .then((res) => res.json())
+    .then((data) => {
+      console.log("Bootstrap-static elements count:", data.elements.length);
+      const map: Record<number, Player> = {};
+      data.elements.forEach((p: Player) => {
+        map[p.id] = p;
+      });
+      setPlayers(map);
+    })
+    .catch((err) => console.error("Failed to fetch players", err));
+}, []);
+
+
+
 
   // Fetch manager history when selected
   useEffect(() => {
@@ -126,20 +156,115 @@ useEffect(() => {
       // console.log("Fetching history for manager ID:", seasonHistory.season_name);
   }, [selectedManager]);
 
-    // Fetch manager summary when selected
-  useEffect(() => {
-    if (!selectedManager) return;
-    setLoadingHistory(true);
-    fetch(`/api/profilesummary?manager_id=${selectedManager.entry}`)
-      .then((res) => res.json())
-      .then((data) => {
-        setManagerProfile(data);   
-        setLoadingProfile(false);
-        
-      })
-      .catch(() => setLoadingProfile(false));
-      console.log("Fetching profile for manager ID:", selectedManager.entry);
-  }, [selectedManager]);
+  
+
+// Fetch manager summary when a manager is selected
+useEffect(() => {
+  if (!selectedManager) return;
+
+  console.log("Fetching manager summary for:", selectedManager.entry);
+  setLoadingProfile(true);
+
+  fetch(`/api/profilesummary?manager_id=${selectedManager.entry}`)
+    .then((res) => res.json())
+    .then((data) => {
+      console.log("Manager summary loaded:", data);
+      setManagerProfile(data);
+    })
+    .catch((err) => console.error("Error fetching manager summary:", err))
+    .finally(() => setLoadingProfile(false));
+}, [selectedManager]);
+
+// Fetch latest team after managerProfile is loaded
+useEffect(() => {
+  if (!selectedManager) return;
+  if (!managerProfile?.current_event) {
+    console.log("Manager profile not ready, skipping latest team fetch");
+    return;
+  }
+
+  const gw = managerProfile.current_event;
+  console.log(`Fetching latest team for manager ${selectedManager.entry}, GW ${gw}`);
+  setLatestTeam([]); // reset
+
+  fetch(`/api/latest-team?manager_id=${selectedManager.entry}&gw=${gw}`)
+    .then((res) => res.json())
+    .then((data) => {
+      if (data?.picks) {
+        console.log("Latest team picks loaded:", data.picks);
+        setLatestTeam(data.picks as PlayerPick[]);
+      } else {
+        console.log("No picks returned", data);
+      }
+    })
+    .catch((err) => console.error("Failed to fetch latest team:", err));
+}, [selectedManager, managerProfile]);
+
+
+function Formation({ picks, players }: { picks: PlayerPick[]; players: Record<number, Player> }) {
+  if (!picks.length || !Object.keys(players).length) return null;
+
+  // Starting XI only
+  const starting = picks.filter((p) => p.position <= 11);
+
+  const byType = {
+    GK: starting.filter((p) => players[p.element]?.element_type === 1),
+    DEF: starting.filter((p) => players[p.element]?.element_type === 2),
+    MID: starting.filter((p) => players[p.element]?.element_type === 3),
+    FWD: starting.filter((p) => players[p.element]?.element_type === 4),
+  };
+
+  return (
+    <div className="bg-green-700 rounded-2xl p-6 text-white">
+      {Object.entries(byType).map(([type, picksByType]) => (
+        <div
+          key={type}
+          className={`flex justify-center gap-4 mb-6 ${type === 'GK' ? 'justify-center mb-6' : ''}`}
+        >
+          {picksByType.map((pick) => {
+            const pl = players[pick.element];
+            return pl ? <PlayerCard key={pick.element} pick={pick} player={pl} /> : null;
+          })}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+
+function getHeadshotUrl(photo: string, size: '110x140' | '250x250' = '110x140') {
+  // photo comes like "141746.jpg" – we need just the numeric part and PNGs
+  const code = photo.split('.')[0];
+  return `https://resources.premierleague.com/premierleague/photos/players/${size}/p${code}.png`;
+}
+
+function PlayerCard({ pick, player }: { pick: PlayerPick; player: Player }) {
+  const [src, setSrc] = React.useState<string>(getHeadshotUrl(player.photo));
+
+  return (
+    <div className="flex flex-col items-center">
+      <Image
+        src={src}
+        alt={player.web_name}
+        width={60}
+        height={60}
+        className="rounded-full border-2 border-white bg-white"
+        onError={() => {
+          // Try the larger size as a fallback (occasionally helps),
+          // and if that ever fails in practice you can point to a local placeholder.
+          setSrc(getHeadshotUrl(player.photo, '250x250'));
+        }}
+        unoptimized
+      />
+      <span className="text-xs mt-1">{player.web_name}</span>
+      {pick.is_captain && <span className="text-yellow-400 font-bold">C</span>}
+      {pick.is_vice_captain && <span className="text-gray-300 text-xs">VC</span>}
+    </div>
+  );
+}
+
+
+
 
   return (
     <div id="profile" className="max-w-xl mx-auto p-4">
@@ -217,6 +342,37 @@ Season&apos;s Rank: {managerProfile.summary_overall_rank}
         </CardContent>
         </Card>
       </div>
+
+{selectedManager && (
+  <div className="text-xs text-muted-foreground mb-2">
+    XI picks: {latestTeam.filter(p => p.position <= 11).length} ·
+    Players loaded: {Object.keys(players).length}
+  </div>
+)}
+<div className="mt-6">
+  {/* Only render latest team when both picks and players are loaded */}
+  {latestTeam.length > 0 ? (
+    Object.keys(players).length === 0 ? (
+      <div>Loading players...</div>
+    ) : (
+      <>
+        {/* Debug logs (optional) */}
+        <pre className="text-xs bg-black text-green-400 p-2 overflow-x-auto">
+          {JSON.stringify(latestTeam.slice(0, 3), null, 2)}
+        </pre>
+        <pre className="text-xs bg-black text-blue-400 p-2 overflow-x-auto">
+          {JSON.stringify(players[latestTeam[0]?.element], null, 2)}
+        </pre>
+
+        {/* Formation */}
+        <Formation picks={latestTeam} players={players} />
+      </>
+    )
+  ) : (
+    managerProfile && <div>No picks available for this gameweek.</div>
+  )}
+</div>
+
 
                   <div className="mt-6">
           <h3 className="text-lg font-semibold mb-2">

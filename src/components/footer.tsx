@@ -24,7 +24,7 @@ export default function Footer() {
         rel="noopener noreferrer"
         className="hover:underline"
       >
-        Sanchez Barry
+        © Sanchez Barry
       </a>
     </footer>
   );

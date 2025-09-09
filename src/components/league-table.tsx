@@ -119,7 +119,7 @@ useEffect(() => {
               <TableHead className="hidden sm:table-cell">Manager</TableHead>
               <TableHead>Total Pts</TableHead>
               <TableHead>GW Pts</TableHead> {/* New column */}
-              <TableHead>Overall Rank</TableHead> {/* New column */}
+              <TableHead className="hidden sm:table-cell">Overall Rank</TableHead> {/* New column */}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -130,7 +130,7 @@ useEffect(() => {
                 <TableCell className="hidden sm:table-cell">{team.player_name}</TableCell>
                 <TableCell>{team.total}</TableCell>
                 <TableCell>{team.gameweek_points}</TableCell> {/* New data */}
-                <TableCell>{team.overall_rank}</TableCell> {/* New data */}
+                <TableCell className="hidden sm:table-cell">{team.overall_rank}</TableCell> {/* New data */}
               </TableRow>
             ))}
           </TableBody>

@@ -110,14 +110,14 @@ export function NavigationMenuDemo() {
                 <NavigationMenuItem>
           <Link href="#line-chart" passHref>
             <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-              League Standings over GWs
+              League over GWs
             </NavigationMenuLink>
           </Link>
         </NavigationMenuItem>
                 <NavigationMenuItem>
           <Link href="#profile" passHref>
             <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-              Manager Profile (See past seasons)
+              Manager Profile
             </NavigationMenuLink>
           </Link>
         </NavigationMenuItem>
