@@ -126,7 +126,7 @@ useEffect(() => {
 
 //get all players once
 useEffect(() => {
-  fetch("https://fantasy.premierleague.com/api/bootstrap-static/")
+  fetch("/api/bootstrap-static")
     .then((res) => res.json())
     .then((data) => {
       console.log("Bootstrap-static elements count:", data.elements.length);
@@ -161,6 +161,9 @@ useEffect(() => {
 // Fetch manager summary when a manager is selected
 useEffect(() => {
   if (!selectedManager) return;
+  console.log("Selected manager 1:", selectedManager);
+  console.log("Manager profile 1:", managerProfile);
+
 
   console.log("Fetching manager summary for:", selectedManager.entry);
   setLoadingProfile(true);
@@ -178,10 +181,11 @@ useEffect(() => {
 // Fetch latest team after managerProfile is loaded
 useEffect(() => {
   if (!selectedManager) return;
-  if (!managerProfile?.current_event) {
-    console.log("Manager profile not ready, skipping latest team fetch");
-    return;
-  }
+    console.log("Selected manager:", selectedManager);
+  console.log("Manager profile:", managerProfile);
+
+  if (!selectedManager || !managerProfile?.current_event) return;
+
 
   const gw = managerProfile.current_event;
   console.log(`Fetching latest team for manager ${selectedManager.entry}, GW ${gw}`);
@@ -206,6 +210,9 @@ function Formation({ picks, players }: { picks: PlayerPick[]; players: Record<nu
 
   // Starting XI only
   const starting = picks.filter((p) => p.position <= 11);
+    // Bench
+  const bench = picks.filter((p) => p.position > 11);
+
 
   const byType = {
     GK: starting.filter((p) => players[p.element]?.element_type === 1),
@@ -227,6 +234,19 @@ function Formation({ picks, players }: { picks: PlayerPick[]; players: Record<nu
           })}
         </div>
       ))}
+
+            {/* Bench */}
+      {bench.length > 0 && (
+        <div className="mt-8">
+          <h4 className="text-center text-base font-semibold mb-2">Bench</h4>
+          <div className="flex justify-center gap-4">
+            {bench.map((pick) => {
+              const pl = players[pick.element];
+              return pl ? <PlayerCard key={pick.element} pick={pick} player={pl} /> : null;
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -345,28 +365,16 @@ Season&apos;s Rank: {managerProfile.summary_overall_rank}
 
 {selectedManager && (
   <div className="text-xs text-muted-foreground mb-2">
-    XI picks: {latestTeam.filter(p => p.position <= 11).length} ·
-    Players loaded: {Object.keys(players).length}
+    {/* XI picks: {latestTeam.filter(p => p.position <= 11).length} ·
+    Players loaded: {Object.keys(players).length} */}
   </div>
 )}
 <div className="mt-6">
-  {/* Only render latest team when both picks and players are loaded */}
   {latestTeam.length > 0 ? (
     Object.keys(players).length === 0 ? (
       <div>Loading players...</div>
     ) : (
-      <>
-        {/* Debug logs (optional) */}
-        <pre className="text-xs bg-black text-green-400 p-2 overflow-x-auto">
-          {JSON.stringify(latestTeam.slice(0, 3), null, 2)}
-        </pre>
-        <pre className="text-xs bg-black text-blue-400 p-2 overflow-x-auto">
-          {JSON.stringify(players[latestTeam[0]?.element], null, 2)}
-        </pre>
-
-        {/* Formation */}
-        <Formation picks={latestTeam} players={players} />
-      </>
+      <Formation picks={latestTeam} players={players} />
     )
   ) : (
     managerProfile && <div>No picks available for this gameweek.</div>

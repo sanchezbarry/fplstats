@@ -55,7 +55,7 @@ import {
 
 export function NavigationMenuDemo() {
   return (
-    <NavigationMenu>
+    <NavigationMenu className="mx-auto w-full">
       <NavigationMenuList>
         {/* <NavigationMenuItem> */}
           {/* <NavigationMenuTrigger>Getting started</NavigationMenuTrigger>
