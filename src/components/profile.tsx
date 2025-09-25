@@ -49,6 +49,7 @@ interface PlayerPick {
   multiplier: number;       // 0 if bench, >0 if starting
   is_captain: boolean;
   is_vice_captain: boolean;
+  points?: number;          // optional points property
 }
 
 interface Player {
@@ -260,6 +261,7 @@ function getHeadshotUrl(photo: string, size: '110x140' | '250x250' = '110x140') 
 
 function PlayerCard({ pick, player }: { pick: PlayerPick; player: Player }) {
   const [src, setSrc] = React.useState<string>(getHeadshotUrl(player.photo));
+  const fallbackSrc = "/silhouette.png"; // Place silhouette.png in /public
 
   return (
     <div className="flex flex-col items-center">
@@ -267,18 +269,28 @@ function PlayerCard({ pick, player }: { pick: PlayerPick; player: Player }) {
         src={src}
         alt={player.web_name}
         width={60}
-        height={60}
+        height={85}
         className="rounded-full border-2 border-white bg-white"
-        onError={() => {
-          // Try the larger size as a fallback (occasionally helps),
-          // and if that ever fails in practice you can point to a local placeholder.
-          setSrc(getHeadshotUrl(player.photo, '250x250'));
-        }}
+        // onError={() => {
+        //   // Try the larger size as a fallback (occasionally helps),
+        //   // and if that ever fails in practice you can point to a local placeholder.
+        //   setSrc(getHeadshotUrl(player.photo, '250x250'));
+
+          
+        // }}
+
+        onError={() => setSrc(fallbackSrc)}
         unoptimized
       />
       <span className="text-xs mt-1">{player.web_name}</span>
       {pick.is_captain && <span className="text-yellow-400 font-bold">C</span>}
-      {pick.is_vice_captain && <span className="text-gray-300 text-xs">VC</span>}
+            {typeof pick.points === "number" && (
+<span className="text-xs mt-1 text-white">
+  {typeof pick.points === "number" ? `${pick.points} pts` : "0 pts"}
+</span>
+      )}
+    
+      
     </div>
   );
 }
