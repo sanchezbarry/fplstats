@@ -7,6 +7,8 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion"
 
+import Link from "next/link"
+
 export default function Faq() {
   return (
     <>
@@ -46,6 +48,20 @@ export default function Faq() {
         <AccordionContent className="flex flex-col gap-4 text-balance">
           <p>
             This is for general league data such as high scoring players, dream teams, etc.
+          </p>
+        </AccordionContent>
+      </AccordionItem>
+
+       <AccordionItem value="item-4">
+        <AccordionTrigger>Background Info</AccordionTrigger>
+        <AccordionContent className="flex flex-col gap-4 text-balance">
+          <p>
+           FPL Stats is simply a personal project of mine. Oliver Looney&apos;s very helpful <Link className="underline" target="_blank" href="https://www.oliverlooney.com/blogs/FPL-APIs-Explained">blog post</Link> carefully explained how 
+           most of APIs can be used to get FPL data.
+          </p>
+
+            <p>
+           For other projects or to contact me for work, visit my website at <Link className="underline" target="_blank" href="https://sanchezbarry.com">sanchezbarry.com</Link>.
           </p>
         </AccordionContent>
       </AccordionItem>

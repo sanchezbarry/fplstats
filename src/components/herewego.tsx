@@ -22,6 +22,7 @@ import { IconArrowBigLeftFilled , IconArrowBigRightFilled } from "@tabler/icons-
 interface Transfer {
   entry: number;
   entry_name: string;
+  player_name?: string; // manager name
   player_in: number;
   player_out: number;
   time: string;
@@ -85,12 +86,14 @@ useEffect(() => {
       .catch(() => setLoading(false));
   }, [gameweek,leagueId]);
 
-  const transfersByManager: Record<string, Transfer[]> = {};
+const transfersByManager: Record<string, Transfer[]> = {};
 transfers.forEach((t) => {
-  if (!transfersByManager[t.entry_name]) {
-    transfersByManager[t.entry_name] = [];
+  // Use both team and manager name as key
+  const key = `${t.entry_name} (${t.player_name || ""})`;
+  if (!transfersByManager[key]) {
+    transfersByManager[key] = [];
   }
-  transfersByManager[t.entry_name].push(t);
+  transfersByManager[key].push(t);
 });
 
   return (
@@ -114,15 +117,20 @@ transfers.forEach((t) => {
     {loading ? (
       <div>Loading transfers...</div>
     ) : (
-      <Accordion type="multiple" className="w-full">
-        {Object.entries(transfersByManager).length === 0 ? (
-          <div className="text-center py-4">No transfers for this gameweek.</div>
-        ) : (
-          Object.entries(transfersByManager).map(([manager, managerTransfers]) => (
-            <AccordionItem key={manager} value={manager}>
-              <AccordionTrigger>
-                      {manager} <span className="ml-2 text-xs text-gray-400">({managerTransfers.length} transfer{managerTransfers.length !== 1 ? "s" : ""})</span>
-              </AccordionTrigger>
+<Accordion type="multiple" className="w-full">
+  {Object.entries(transfersByManager).length === 0 ? (
+    <div className="text-center py-4">No transfers for this gameweek.</div>
+  ) : (
+    Object.entries(transfersByManager).map(([key, managerTransfers]) => (
+<AccordionItem className="text-xl" key={key} value={key}>
+  <AccordionTrigger>
+    <div className="flex w-full items-center justify-between">
+      <span>{key}</span>
+      <span className="ml-2 text-xs text-gray-400">
+        ({managerTransfers.length} transfer{managerTransfers.length !== 1 ? "s" : ""})
+      </span>
+    </div>
+  </AccordionTrigger>
               <AccordionContent>
                 <Table>
                   <TableHeader className="">
