@@ -16,6 +16,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 
 
 export default function Home() {
+
+
   interface Team {
     entry: number;
     rank: number;
@@ -90,6 +92,33 @@ export default function Home() {
     fetchData();
   }, [selectedGameweek, leagueId]);
 
+
+
+    //ai summary
+    const [gwSummary, setGwSummary] = useState<string | null>(null);
+  const [gwSummaryLoading, setGwSummaryLoading] = useState(false);
+
+  useEffect(() => {
+    if (!selectedGameweek) return;
+    let mounted = true;
+    setGwSummaryLoading(true);
+    fetch(`/api/gw-summary?gameweek=${selectedGameweek}&league_id=${leagueId}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (!mounted) return;
+        setGwSummary(data?.summary || null);
+      })
+      .catch((err) => {
+        console.error("Failed to fetch gw summary", err);
+        setGwSummary(null);
+      })
+      .finally(() => mounted && setGwSummaryLoading(false));
+    return () => {
+      mounted = false;
+    };
+  }, [selectedGameweek, leagueId]);
+  
+
   return (
     <>
       <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen pb-20 sm:px-5 px-2.5 gap-16 font-[family-name:var(--font-geist-sans)]">
@@ -124,6 +153,23 @@ export default function Home() {
               </SelectContent>
             </Select>
           </div>
+
+
+          {/* summary */}
+                <div className="mb-4 w-full max-w-4xl">
+        <div className="mb-2">
+          <h2 className="text-lg font-semibold">Gameweek Summary</h2>
+        </div>
+        <div className="p-4 rounded-md bg-slate-50 text-slate-900">
+          {gwSummaryLoading ? (
+            <div>Generating summary...</div>
+          ) : gwSummary ? (
+            <div>{gwSummary}</div>
+          ) : (
+            <div className="text-sm text-gray-500">No summary available.</div>
+          )}
+        </div>
+      </div>
 
           <LeagueTable
             leagueId={leagueId}
