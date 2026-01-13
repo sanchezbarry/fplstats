@@ -343,7 +343,7 @@ const GEMINI_KEY = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
         });
 
         // 5. Extract text (guard against undefined)
-        summary = response?.text?.trim() ?? "";
+        summary = response?.text?.trim() ?? ""; 
 
       } catch (err) {
         aiError = `Gemini SDK error: ${String(err)}`;
