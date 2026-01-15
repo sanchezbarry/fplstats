@@ -40,8 +40,26 @@ export default function Home() {
     }
   }, [leagueId]);
 
+  // useEffect(() => {
+  //   async function fetchLatestGameweek() {
+  //     const res = await fetch("/api/bootstrap-static");
+  //     const data = await res.json();
+  //     type Event = {
+  //       id: number;
+  //       finished: boolean;
+  //       is_current: boolean;
+  //     };
+  //     const latest = (data.events as Event[] || [])
+  //       .filter((e: Event) => e.finished || e.is_current)
+  //       .sort((a: Event, b: Event) => b.id - a.id)[0];
+  //     if (latest) setSelectedGameweek(latest.id.toString());
+  //   }
+  //   fetchLatestGameweek();
+  // }, []);
+
   useEffect(() => {
-    async function fetchLatestGameweek() {
+  async function fetchLatestGameweek() {
+    try {
       const res = await fetch("/api/bootstrap-static");
       const data = await res.json();
       type Event = {
@@ -52,10 +70,15 @@ export default function Home() {
       const latest = (data.events as Event[] || [])
         .filter((e: Event) => e.finished || e.is_current)
         .sort((a: Event, b: Event) => b.id - a.id)[0];
-      if (latest) setSelectedGameweek(latest.id.toString());
+      if (latest) {
+        setSelectedGameweek(latest.id.toString());
+      }
+    } catch (err) {
+      console.error("Failed to fetch latest gameweek:", err);
     }
-    fetchLatestGameweek();
-  }, []);
+  }
+  fetchLatestGameweek();
+}, []); // Only run once on mount
 
   const fetchStandings = async (gameweek: string) => {
     setLoading(true);
